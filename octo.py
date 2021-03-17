@@ -2,21 +2,20 @@ import discord
 import os
 import types
 
-client = discord.Client()
+bot = discord.Client()
+#profile = discord.ClientUser()
 
 octo = types.SimpleNamespace()
 octo.happy = False
 
-
-@client.event
+@bot.event
 async def on_ready():
-  print('We have logged in as {0.user}'.format(client))
+  print(f'We have logged in as {bot.user}')
 
-@client.event
+@bot.event
 async def on_message(message):
-  if message.author == client.user:
+  if message.author == bot.user:
       return
-
 
   if message.content.startswith('OCTO FLIP'):
     await message.channel.send("OCTO FLIP!")
@@ -25,9 +24,16 @@ async def on_message(message):
   if message.content.startswith('OCTO'):
     if octo.happy:
       picture = discord.File(open('octo_happy.jpg','rb'))
+      av = open('octo_happy.jpg','rb')
+      await bot.change_presence(status="OCTO HAPPY!")
       await message.channel.send(file=picture)
+      await bot.user.edit(avatar=av.read())
+
     else:
       picture = discord.File(open('octo_angry.jpg','rb'))
+      av = open('octo_angry.jpg','rb')
+      await bot.change_presence(status="OCTO ANGRY!")
       await message.channel.send(file=picture)
+      await bot.user.edit(avatar=av.read())
 
-client.run(os.getenv('TOKEN'))
+bot.run(os.getenv('TOKEN'))
