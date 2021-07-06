@@ -6,3 +6,7 @@ services:
     image: bhodi/octobot:latest
     environment:
       - "TOKEN=${TOKEN}"
+    libA
+    volumes:
+      - ~/tiktok/:/tiktok
+
