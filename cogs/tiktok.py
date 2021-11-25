@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import logging
 from io import open
+from asyncio import sleep
 from youtube_dl import YoutubeDL
 from discord import File
 from discord_slash import cog_ext
@@ -33,6 +34,7 @@ class Tiktok(Cog):
     """Give me a long and shitty tiktok (or youtube-dl supported) URL and I'll do all the work for you"""
     
     await ctx.send('Octobot preparing video!', delete_after=10)
+    log.info(f'Trying: {url} For: {ctx.author.name}')
 
     ydl_opts = {
       'noprogress': True,
@@ -56,6 +58,7 @@ class Tiktok(Cog):
       except BaseException as err:
         log.error(err)
         error = err
+        sleep(2)
         continue
       else:
         with open(ydl.prepare_filename(info), 'rb') as fp:
