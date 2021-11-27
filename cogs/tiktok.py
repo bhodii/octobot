@@ -33,15 +33,18 @@ class Tiktok(Cog):
   async def tiktok(self, ctx: SlashContext, url: str):
     """Give me a long and shitty tiktok (or youtube-dl supported) URL and I'll do all the work for you"""
     
-    await ctx.send('Octobot preparing video!', delete_after=10)
+    await ctx.defer()
     log.info(f'Trying: {url} For: {ctx.author.name}')
 
     ydl_opts = {
       'noprogress': True,
+      'retries': 0,
+      'download_archive': "download_archive",
       'nocheckcertificate': True,
       'restrictfilenames': True,
       'updatetime': False,
       'writeinfojson': True,
+      'verbose': True,
       'logger': log
       #'progress_hooks': [my_hook],
     }
@@ -50,20 +53,20 @@ class Tiktok(Cog):
     info = {}
     error = BaseException
     ydl = YoutubeDL(ydl_opts)
-    for _ in range(1):
+    for _ in range(3):
       try:
         info = ydl.extract_info(url) # Also downloads file
         log.info(f'Downloaded: {ydl.prepare_filename(info)} For: {ctx.author.name}')
         # TODO Add in {'requestor': ctx.author.name, 'requestor_id': ctx.author_id } to info json
       except BaseException as err:
-        log.error(err)
+        log.error(f'Failed Try #{_}: {err}')
         error = err
-        sleep(2)
+        await sleep(3)
         continue
       else:
         with open(ydl.prepare_filename(info), 'rb') as fp:
-          await ctx.channel.send(content=f'@{ctx.author.name}: {info["description"]}', files=[File(fp)])
+          await ctx.send(content=f'{info["description"]}', files=[File(fp)])
         break
     else:
-        log.error(f'Failed Download: {ydl.prepare_filename(info)} For: {ctx.author.name}')
-        await ctx.channel.send('Octobot has failed you.', delete_after=10)
+      log.error(f'Failed Download: {url} For: {ctx.author.name}')
+      await ctx.send(content='Octobot has failed you. Please try again in a minute.')
