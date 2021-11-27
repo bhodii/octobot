@@ -3,7 +3,7 @@ __pycache__/
 cogs/__pycache__
 logs/
 config.yml
-already_download.txt
+download_archive
 
 .env*
 *.pyc
